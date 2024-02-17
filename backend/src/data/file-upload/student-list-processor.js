@@ -1,14 +1,21 @@
 import { User } from "../schema.js";
-import fs from "fs";
 import yup from "yup";
-import bcrypt from "bcrypt";
-import { parse } from "csv-parse";
+import { parseCsv } from "./parse-csv.js";
+// import bcrypt from "bcrypt";
 
-const NUM_HEADER_ROWS = 4;
+const NUM_HEADER_ROWS = 3;
 const COL_NAME = 0;
 const COL_UPI = 3;
 const COL_ID = 2;
 
+/**
+ * Processes the Canvas gradebook CSV file to add all students in that file to the database.
+ *
+ * Removes duplicates - i.e. does not add any students who are already in the database.
+ *
+ * @param {*} csvFile the file to process
+ * @returns the result of adding all new students in the file to the database.
+ */
 export async function addStudentsFromGradebookCSV(csvFile) {
   const records = await parseCsv(csvFile);
 
@@ -17,7 +24,7 @@ export async function addStudentsFromGradebookCSV(csvFile) {
   let newStudents = [];
 
   // Go thru all lines other than the headers.
-  for (let recordNum = NUM_HEADER_ROWS - 1; recordNum < records.length; recordNum++) {
+  for (let recordNum = NUM_HEADER_ROWS; recordNum < records.length; recordNum++) {
     const record = records[recordNum];
     if (!record || record.length === 0) break; // We're done when we reach an empty line
 
@@ -49,34 +56,6 @@ export async function addStudentsFromGradebookCSV(csvFile) {
         })
     )
   );
-}
-
-/**
- * Parses the given CSV file and returns an array of its lines.
- *
- * @param {*} csvFile the file to parse
- * @returns an array of records - each one will be an array of strings.
- */
-function parseCsv(csvFile) {
-  const data = fs.readFileSync(csvFile, { encoding: "utf-8" });
-  //   const lines = data.split("\n").map((l) => l.trim());
-
-  const myPromise = new Promise((resolve, reject) => {
-    const records = [];
-    const parser = parse();
-    parser.on("readable", () => {
-      let record;
-      while ((record = parser.read()) !== null) {
-        records.push(record);
-      }
-    });
-    parser.on("error", reject);
-    parser.on("end", () => resolve(records));
-    parser.write(data);
-    parser.end();
-  });
-
-  return myPromise;
 }
 
 /**

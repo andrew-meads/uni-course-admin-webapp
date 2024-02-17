@@ -3,16 +3,16 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import FileUploadDragDrop from "../../components/FileUploadDragDrop";
 import { useAuth } from "../../components/Auth";
 import { useState } from "react";
-import { uploadStudentListCSV } from "../../js/api/apis";
+import { uploadProjectGroupSignupCSV } from "../../js/api/apis";
 
 /**
- * A modal dialog for handling uploading a student CSV.
+ * A modal dialog for handling uploading the proejct group signup CSV.
  */
-export default function UploadGradebookCSVModal({ show, onClose }) {
+export default function UploadProjectGroupsCSVModal({ show, onClose }) {
   const [file, setFile] = useState(null);
   const [isUploading, setUploading] = useState(false);
   const [isSuccess, setSuccess] = useState(false);
-  const [numNewStudents, setNumNewStudents] = useState(0);
+  const [numNewGroups, setNumNewGroups] = useState(0);
   const [error, setError] = useState(null);
   const { token } = useAuth();
 
@@ -27,17 +27,17 @@ export default function UploadGradebookCSVModal({ show, onClose }) {
 
     const form = new FormData();
     form.append("file", file);
-    uploadStudentListCSV(form, token)
+    uploadProjectGroupSignupCSV(form, token)
       .then((response) => {
-        // console.log(response);
-        setNumNewStudents(response.data.newStudents);
         setSuccess(true);
         setUploading(false);
+        setNumNewGroups(response.data.newGroups);
         setFile(null);
       })
       .catch((error) => {
-        console.error(error);
-        setError(error);
+        const data = error.response?.data;
+        console.error(data ?? error);
+        setError(data ?? ["Unknown error - check browser console!"]);
         setUploading(false);
       });
   }
@@ -59,7 +59,7 @@ export default function UploadGradebookCSVModal({ show, onClose }) {
       </Modal.Header>
       <Modal.Body>
         {/* Drag & drop box for allowing CSV upload */}
-        <p>Drag & drop or click to upload a student gradebook CSV file.</p>
+        <p>Drag & drop or click to upload a project signup CSV file.</p>
         <FileUploadDragDrop mimeType={"text/csv"} onFilesDropped={(f) => setFile(f[0])}>
           {file ? <span>{file.name}</span> : undefined}
         </FileUploadDragDrop>
@@ -72,12 +72,17 @@ export default function UploadGradebookCSVModal({ show, onClose }) {
         ) : undefined}
         {isSuccess ? (
           <Alert className="mt-2" variant="success" dismissible onClose={() => setSuccess(false)}>
-            File uploaded successfully! <strong>{numNewStudents}</strong> new students were added.
+            File uploaded successfully! {numNewGroups} groups were added.
           </Alert>
         ) : undefined}
         {error ? (
           <Alert className="mt-2" variant="danger" dismissible onClose={() => setError(null)}>
-            There was an error uploading the file. See browser console for details.
+            There were some errors with the uploaded file:
+            <ul>
+              {error.map((e, i) => (
+                <li key={i}>{e}</li>
+              ))}
+            </ul>
           </Alert>
         ) : undefined}
       </Modal.Body>

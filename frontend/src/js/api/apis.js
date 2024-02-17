@@ -21,6 +21,12 @@ export const useGetStudents = () => useGet(`${USERS_URL}?role=student`, { requir
 export const uploadStudentListCSV = (formData, token) =>
   axios.post(`${UPLOADS_URL}/student-list`, formData, authHeader(token));
 
+export const uploadGitHubUsernamesCSV = (formData, token) =>
+  axios.post(`${UPLOADS_URL}/github-usernames`, formData, authHeader(token));
+
+export const uploadProjectGroupSignupCSV = (formData, token) =>
+  axios.post(`${UPLOADS_URL}/project-signup`, formData, authHeader(token));
+
 const authHeader = (token) => ({
   headers: {
     authorization: `Bearer ${token}`
