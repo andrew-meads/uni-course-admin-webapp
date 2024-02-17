@@ -1,0 +1,21 @@
+.container {
+  margin: 0 auto;
+  width: 1000px;
+
+  @media (max-width: 1100px) {
+    margin: 0 50px;
+    width: auto;
+  }
+}
+
+.allGroupsGrid {
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap);
+}
+
+.bigGroupsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+}

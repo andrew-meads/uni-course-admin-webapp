@@ -1,0 +1,17 @@
+.mainGrid {
+  display: flex;
+  grid-template-columns: auto 1fr;
+  column-gap: 20px;
+
+  & > main {
+    flex-grow: 1;
+  }
+
+  & > aside {
+    border-right: 2px dashed lightgray;
+  }
+
+  & > aside > div {
+    width: 350px;
+  }
+}

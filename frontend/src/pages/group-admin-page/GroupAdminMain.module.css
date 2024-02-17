@@ -1,0 +1,9 @@
+.groupsContainer {
+  position: absolute;
+  top: 303px;
+  bottom: 0;
+  overflow-y: scroll;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}

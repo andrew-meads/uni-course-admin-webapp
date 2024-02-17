@@ -1,0 +1,25 @@
+/* :root {
+  --gap: 5px;
+  --primary-color: blue;
+  --radius: 5px;
+  --radius-large: 20px;
+  --shadow-color: lightgray;
+  --shadow-size: 2px;
+  --shadow-blur: 2px;
+  --shadow: var(--shadow-size) var(--shadow-size) var(--shadow-blur)
+    var(--shadow-color);
+
+  font-family: "Roboto";
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.card {
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--gap);
+} */

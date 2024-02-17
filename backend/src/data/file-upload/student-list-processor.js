@@ -1,0 +1,111 @@
+import { User } from "../schema.js";
+import fs from "fs";
+import yup from "yup";
+import bcrypt from "bcrypt";
+import { parse } from "csv-parse";
+
+const NUM_HEADER_ROWS = 4;
+const COL_NAME = 0;
+const COL_UPI = 3;
+const COL_ID = 2;
+
+export async function addStudentsFromGradebookCSV(csvFile) {
+  const records = await parseCsv(csvFile);
+
+  // console.log(records);
+
+  let newStudents = [];
+
+  // Go thru all lines other than the headers.
+  for (let recordNum = NUM_HEADER_ROWS - 1; recordNum < records.length; recordNum++) {
+    const record = records[recordNum];
+    if (!record || record.length === 0) break; // We're done when we reach an empty line
+
+    // Get student from line data (throw error if invalid)
+    const student = validatedStudent(record);
+
+    // If already in DB, skip
+    // if (await User.findOne({ emailAddress: student.emailAddress })) continue;
+
+    newStudents.push(student);
+  }
+
+  // Do one query for all matching email addresses... faster this way.
+  const emailAddresses = newStudents.map((s) => s.emailAddress);
+  const existingStudents = await User.find({ emailAddress: { $in: emailAddresses } });
+  const existingEmailAddresses = existingStudents.map((s) => s.emailAddress);
+  newStudents = newStudents.filter((s) => !existingEmailAddresses.includes(s.emailAddress));
+
+  // Save all students after dupes are removed
+  return await User.bulkSave(
+    newStudents.map(
+      (s) =>
+        new User({
+          ...s,
+          roles: ["student"],
+          loginUuid: null,
+          githubUsername: null,
+          passHash: null // bcrypt.hashSync("password", 10) // TODO Fix this
+        })
+    )
+  );
+}
+
+/**
+ * Parses the given CSV file and returns an array of its lines.
+ *
+ * @param {*} csvFile the file to parse
+ * @returns an array of records - each one will be an array of strings.
+ */
+function parseCsv(csvFile) {
+  const data = fs.readFileSync(csvFile, { encoding: "utf-8" });
+  //   const lines = data.split("\n").map((l) => l.trim());
+
+  const myPromise = new Promise((resolve, reject) => {
+    const records = [];
+    const parser = parse();
+    parser.on("readable", () => {
+      let record;
+      while ((record = parser.read()) !== null) {
+        records.push(record);
+      }
+    });
+    parser.on("error", reject);
+    parser.on("end", () => resolve(records));
+    parser.write(data);
+    parser.end();
+  });
+
+  return myPromise;
+}
+
+/**
+ * A schema for a student from a CSV line. Requires the given params.
+ */
+const studentSchema = yup
+  .object({
+    uniId: yup.number().integer().required(),
+    firstName: yup.string().min(1).required(),
+    lastName: yup.string().min(1).required(),
+    emailAddress: yup.string().email().required()
+  })
+  .required();
+
+/**
+ * Validates and returns
+ * @param {*} line
+ * @returns
+ */
+function validatedStudent(line) {
+  const name = line[COL_NAME];
+  const commaIndex = name.indexOf(",");
+  return studentSchema.validateSync(
+    {
+      uniId: line[COL_ID],
+      firstName: name.substring(commaIndex + 2),
+      lastName: name.substring(0, commaIndex),
+      emailAddress: `${line[COL_UPI]}@aucklanduni.ac.nz`
+    },
+    { abortEarly: true, stripUnknown: true }
+  );
+}

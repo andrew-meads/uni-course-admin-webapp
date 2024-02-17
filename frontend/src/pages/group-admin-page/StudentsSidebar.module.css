@@ -1,0 +1,46 @@
+.studentListDiv {
+  position: absolute;
+  top: 303px;
+  bottom: 0;
+  width: 352px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  border-right: 2px dashed lightgray;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.expand,
+.collapse {
+  animation-timing-function: ease;
+  animation-duration: 0.35s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+.expand {
+  animation-name: animate-expand;
+}
+
+.collapse {
+  animation-name: animate-collapse;
+}
+
+@keyframes animate-expand {
+  from {
+    width: 0;
+  }
+  to {
+    width: 352px;
+  }
+}
+
+@keyframes animate-collapse {
+  from {
+    width: 352px;
+  }
+  to {
+    width: 0;
+  }
+}
