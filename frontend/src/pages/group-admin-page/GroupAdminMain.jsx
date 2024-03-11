@@ -4,19 +4,23 @@ import styles from "./GroupAdminMain.module.css";
 import { useState } from "react";
 import GroupsList from "../../components/group-admin-page/GroupsList";
 import clsx from "clsx";
-import { useStudents } from "../../js/state/use-students";
 import { useDialog } from "../../components/DialogProvider";
+import { useAuth } from "../../components/Auth";
 
 /**
  * Main area of group admin page, allows new group creation and dragging of students to groups.
  */
 export default function GroupAdminMain() {
   const showDialog = useDialog();
+  const { token } = useAuth();
 
   // State relating to showing groups
-  const { moveStudentToGroup } = useStudents();
-  const { groupsWithStudents, mergeGroups, deleteGroup, createNewGroup } = useGroups();
+  // const { moveStudentToGroup } = useStudents();
+  // const { groupsWithStudents, mergeGroups, deleteGroup, createNewGroup } = useGroups();
+  const { groups, createNewGroup, mergeGroups, deleteGroup, moveStudentToGroup } = useGroups(token);
   const [groupNameFilter, setGroupNameFilter] = useState("");
+  const [groupSizeFilter, setGroupSizeFilter] = useState();
+  const [isGroupSizeLessThan, setGroupSizeLessThen] = useState(false);
 
   // State relating to merging groups
   const [showMergeDialog, setShowMergeDialog] = useState(false);
@@ -36,8 +40,7 @@ export default function GroupAdminMain() {
     if (name === "")
       return showDialog({ title: "No name provided", content: "Please enter a group name!" });
 
-    const exists =
-      groupsWithStudents.findIndex((g) => g.name.toLowerCase() === name.toLowerCase()) >= 0;
+    const exists = groups.findIndex((g) => g.name.toLowerCase() === name.toLowerCase()) >= 0;
 
     if (exists)
       return showDialog({
@@ -52,7 +55,7 @@ export default function GroupAdminMain() {
         content: `"${name}" is not a valid group name.`
       });
 
-    createNewGroup(name);
+    createNewGroup(name, token);
   }
 
   // Closes the "merge groups" dialog
@@ -65,7 +68,7 @@ export default function GroupAdminMain() {
   function handleAcceptMerge() {
     setShowMergeDialog(false);
     const { targetGroup, sourceGroup } = groupsToMerge;
-    mergeGroups(targetGroup, sourceGroup);
+    mergeGroups(targetGroup, sourceGroup, token);
   }
 
   // Closes the "delete group" dialog
@@ -76,7 +79,7 @@ export default function GroupAdminMain() {
    * group to be deleted.
    */
   function handleAcceptDelete() {
-    deleteGroup(groupToDelete);
+    deleteGroup(groupToDelete, true, token);
     setGroupToDelete(null);
   }
 
@@ -87,8 +90,8 @@ export default function GroupAdminMain() {
    * @param {import('../../js/typedefs').Student} student the student which was dropped
    */
   function handleStudentDropped(group, student) {
-    // console.log("group", group, "student", student);
-    moveStudentToGroup(student, group.id);
+    console.log(`${student.firstName} ${student.lastName} dropped onto group ${group.name}`);
+    moveStudentToGroup(student, group, token);
   }
 
   /**
@@ -99,10 +102,24 @@ export default function GroupAdminMain() {
    * @param {import('../../js/typedefs').Group} sourceGroup the group which was dropped
    */
   function handleGroupDropped(targetGroup, sourceGroup) {
-    // console.log("targetGroup", targetGroup, "sourceGroup", sourceGroup);
+    console.log(`${sourceGroup.name} dropped onto ${targetGroup.name}`);
     setGroupsToMerge({ targetGroup, sourceGroup });
     setShowMergeDialog(true);
   }
+
+  const filteredGroups = groups.filter(
+    (g) =>
+      (!!!groupNameFilter ||
+        groupNameFilter === "" ||
+        g.name.toLowerCase().includes(groupNameFilter.toLowerCase())) &&
+      (isNaN(groupSizeFilter) ||
+        (isGroupSizeLessThan && g.members.length <= groupSizeFilter) ||
+        (!isGroupSizeLessThan && g.members.length >= groupSizeFilter))
+  );
+
+  let showGroupsMessage = "Currently showing groups with any number of students";
+  if (groupSizeFilter !== undefined && !isNaN(groupSizeFilter))
+    showGroupsMessage = `Currently showing groups with ${isGroupSizeLessThan ? "<=" : ">="} ${groupSizeFilter} students`;
 
   return (
     <>
@@ -121,8 +138,31 @@ export default function GroupAdminMain() {
                 onChange={(e) => setGroupNameFilter(e.target.value)}
               />
             </Col>
-            <Col xs="auto">
+            <Col xs="6">
               <Button onClick={handleCreateNewGroup}>Create new group</Button>
+            </Col>
+            {/* <Col xs="3">
+              <Button onClick={handleCreateNewGroup}>Assign group names</Button>
+            </Col> */}
+          </Row>
+          <Row className="mt-2">
+            <Col>
+              <Form.Control
+                type="number"
+                placeholder="Filter group size"
+                value={groupSizeFilter}
+                onChange={(e) => setGroupSizeFilter(parseInt(e.target.value))}
+              />
+            </Col>
+            <Col xs="6" className="align-self-center">
+              <Form.Check
+                className="text-secondary"
+                id="greater-than-switch"
+                type="switch"
+                label={showGroupsMessage}
+                checked={isGroupSizeLessThan}
+                onChange={(e) => setGroupSizeLessThen(e.target.checked)}
+              />
             </Col>
           </Row>
         </Form>
@@ -130,8 +170,7 @@ export default function GroupAdminMain() {
         {/* Space for holding all group cards */}
         <div className={clsx(styles.groupsContainer)}>
           <GroupsList
-            groups={groupsWithStudents}
-            nameFilter={groupNameFilter}
+            groups={filteredGroups}
             onStudentDropped={handleStudentDropped}
             onGroupDropped={handleGroupDropped}
             onDeleteGroup={(g) => setGroupToDelete(g)}

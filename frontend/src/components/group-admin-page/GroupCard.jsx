@@ -4,21 +4,17 @@ import clsx from "clsx";
 import { useDrag, useDrop } from "react-dnd";
 import { ItemTypes } from "../../js/drag-drop";
 import { useRef } from "react";
-
-/**
- * @typedef {object} GroupCardProps
- * @property {import('../../js/typedefs').GroupWithStudents} group
- * @property {(group: import('../../js/typedefs').Group, student: import('../../js/typedefs').Student) => void} onStudentDropped
- * @property {(targetGroup: import('../../js/typedefs').Group, sourceGroup: import('../../js/typedefs').Group) => void} onGroupDropped
- * @property {(group: import('../../js/typedefs').Group) => void} onDelete
- */
+import { useAuth } from "../Auth";
+import { useGroups } from "../../js/state/use-groups";
 
 /**
  * Renders a group card. Acts as a drop target for both students and groups. Also acts as a drag source for groups.
- *
- * @param {GroupCardProps}} props
  */
 export default function GroupCard({ group, onStudentDropped, onGroupDropped, onDelete }) {
+  const { token } = useAuth();
+  const { getStudentsInGroup } = useGroups(token);
+  const students = getStudentsInGroup(group);
+
   const ref = useRef(null);
 
   // Setup drop target. This card can accept groups and students, but cannot accept the
@@ -27,10 +23,10 @@ export default function GroupCard({ group, onStudentDropped, onGroupDropped, onD
     accept: [ItemTypes.STUDENT, ItemTypes.GROUP],
     collect: (monitor) => ({ isOver: monitor.isOver() && monitor.canDrop() }),
     canDrop: (item, monitor) => {
-      if (monitor.getItemType() === ItemTypes.GROUP && group.id === item.id) return false;
+      if (monitor.getItemType() === ItemTypes.GROUP && group._id === item._id) return false;
       if (
         monitor.getItemType() === ItemTypes.STUDENT &&
-        group.students.findIndex((s) => s.id === item.id) >= 0
+        students.findIndex((s) => s._id === item._id) >= 0
       )
         return false;
       return true;
@@ -54,11 +50,15 @@ export default function GroupCard({ group, onStudentDropped, onGroupDropped, onD
   const bg = isDragging ? "info" : isOver ? "success" : undefined;
 
   return (
-    <Card ref={ref} style={{ width: "300px" }} bg={bg}>
-      <Card.Img variant="top" src="https://placehold.co/300x100" />
+    <Card ref={ref} style={{ width: "600px" }} bg={bg}>
+      <Card.Img variant="top" src="https://placehold.co/600x50" />
       <Card.Body>
         <Card.Title>{group.name}</Card.Title>
-        <GroupStudentsList group={group} />
+        <p>
+          <strong>Ideas: </strong>
+          {group.initialIdeas && group.initialIdeas.length > 0 ? group.initialIdeas : "None"}
+        </p>
+        <GroupStudentsList students={students} />
         <div style={{ display: "flex", justifyContent: "end" }}>
           <Button variant="danger" size="sm" onClick={() => onDelete(group)}>
             Delete group
@@ -71,12 +71,8 @@ export default function GroupCard({ group, onStudentDropped, onGroupDropped, onD
 
 /**
  * Displays students in a group.
- *
- * @param {{group: import('../../js/typedefs').GroupWithStudents}} props
  */
-function GroupStudentsList({ group }) {
-  const students = group.students;
-
+function GroupStudentsList({ students }) {
   if (students.length === 0)
     return (
       <p className="text-secondary">
@@ -87,7 +83,7 @@ function GroupStudentsList({ group }) {
   return (
     <div className={clsx(styles.studentContainer, "mb-2")}>
       {students.map((s) => (
-        <GroupStudent key={s.id} student={s} />
+        <GroupStudent key={s._id} student={s} />
       ))}
     </div>
   );
@@ -95,8 +91,6 @@ function GroupStudentsList({ group }) {
 
 /**
  * Displays a single student; can be dragged to different groups.
- *
- * @param {{student: import('../../js/typedefs').Student}} props
  */
 function GroupStudent({ student }) {
   // Setup drag source. This component represents the student it is rendering.
@@ -108,7 +102,7 @@ function GroupStudent({ student }) {
 
   return (
     <span ref={dragRef} className={clsx(styles.studentSpan, isDragging && styles.studentDragging)}>
-      {student.name}
+      {student.firstName} {student.lastName}
     </span>
   );
 }

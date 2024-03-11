@@ -14,23 +14,12 @@ import GroupCard from "./GroupCard";
  *
  * @param {GroupsListProps} props
  */
-export default function GroupsList({
-  groups,
-  nameFilter,
-  onStudentDropped,
-  onGroupDropped,
-  onDeleteGroup
-}) {
-  const filteredGroups = groups.filter(
-    (g) =>
-      !!!nameFilter || nameFilter === "" || g.name.toLowerCase().includes(nameFilter.toLowerCase())
-  );
-
+export default function GroupsList({ groups, onStudentDropped, onGroupDropped, onDeleteGroup }) {
   return (
     <>
-      {filteredGroups.map((g) => (
+      {groups.map((g) => (
         <GroupCard
-          key={g.id}
+          key={g._id}
           group={g}
           onStudentDropped={onStudentDropped}
           onGroupDropped={onGroupDropped}

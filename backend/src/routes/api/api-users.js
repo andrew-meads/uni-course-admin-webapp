@@ -1,7 +1,7 @@
 import express from "express";
 import requiresAuth from "../../middleware/auth.js";
 import { verifyGitHubUsername } from "../../external-apis/github.js";
-import { User } from "../../data/schema.js";
+import { User, ProjectGroup } from "../../data/schema.js";
 import bcrypt from "bcrypt";
 import yup from "yup";
 
@@ -129,6 +129,44 @@ router.patch("/me/password", requiresAuth(), async (req, res) => {
   // Create new hash and update DB
   const passHash = await bcrypt.hash(password, 10);
   await User.findByIdAndUpdate(req.user._id, { passHash });
+
+  return res.sendStatus(204);
+});
+
+/**
+ * Move a student to a group
+ */
+router.put("/:id/group", requiresAuth("admin"), async (req, res) => {
+  // Must supply groupId
+  const { groupId } = req.body;
+  if (!groupId) return res.sendStatus(422);
+
+  // Must be an existing student
+  const user = await User.findById(req.params.id);
+  if (!user) return res.sendStatus(404);
+  if (!user.roles.includes("student")) return res.sendStatus(422);
+
+  // Find student's new group
+  const newGroup = await ProjectGroup.findById(groupId);
+  if (!newGroup) return res.sendStatus(404);
+  // console.log(`New group: ${newGroup.name}`);
+
+  // Find student's existing group, if any
+  const existingGroup = await ProjectGroup.findOne({ "members.student": user._id });
+  let memberRecord = existingGroup?.members.find((r) => r.student.equals(user._id));
+  // console.log(`Existing group: ${existingGroup?.name}`);
+  // console.log(memberRecord);
+
+  // Delete student from existing group if required
+  if (existingGroup) {
+    existingGroup.members = existingGroup.members.filter((m) => !m.student.equals(user._id));
+    await existingGroup.save();
+  }
+
+  // Add student to new group
+  if (!memberRecord) memberRecord = { student: user._id, isGithubInviteSent: false };
+  newGroup.members.push(memberRecord);
+  await newGroup.save();
 
   return res.sendStatus(204);
 });

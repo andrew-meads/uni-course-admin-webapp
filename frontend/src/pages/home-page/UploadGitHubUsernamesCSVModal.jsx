@@ -3,16 +3,15 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import FileUploadDragDrop from "../../components/FileUploadDragDrop";
 import { useAuth } from "../../components/Auth";
 import { useState } from "react";
-import { uploadStudentListCSV } from "../../js/api/apis";
+import { uploadGitHubUsernamesCSV } from "../../js/api/apis";
 
 /**
- * A modal dialog for handling uploading a student CSV.
+ * A modal dialog for handling uploading the GitHub Usernames CSV.
  */
-export default function UploadGradebookCSVModal({ show, onClose }) {
+export default function UploadGitHubUsernamesCSVModal({ show, onClose }) {
   const [file, setFile] = useState(null);
   const [isUploading, setUploading] = useState(false);
   const [isSuccess, setSuccess] = useState(false);
-  const [numNewStudents, setNumNewStudents] = useState(0);
   const [error, setError] = useState(null);
   const { token } = useAuth();
 
@@ -27,10 +26,13 @@ export default function UploadGradebookCSVModal({ show, onClose }) {
 
     const form = new FormData();
     form.append("file", file);
-    uploadStudentListCSV(form, token)
+    uploadGitHubUsernamesCSV(form, token)
       .then((response) => {
-        // console.log(response);
-        setNumNewStudents(response.data.newStudents);
+        const errors = response.data;
+        if (errors && errors.length > 0) {
+          console.error(errors);
+          setError(errors);
+        }
         setSuccess(true);
         setUploading(false);
         setFile(null);
@@ -59,7 +61,7 @@ export default function UploadGradebookCSVModal({ show, onClose }) {
       </Modal.Header>
       <Modal.Body>
         {/* Drag & drop box for allowing CSV upload */}
-        <p>Drag & drop or click to upload a student gradebook CSV file.</p>
+        <p>Drag & drop or click to upload a GitHub usernames CSV file.</p>
         <FileUploadDragDrop mimeType={"text/csv"} onFilesDropped={(f) => setFile(f[0])}>
           {file ? <span>{file.name}</span> : undefined}
         </FileUploadDragDrop>
@@ -72,12 +74,12 @@ export default function UploadGradebookCSVModal({ show, onClose }) {
         ) : undefined}
         {isSuccess ? (
           <Alert className="mt-2" variant="success" dismissible onClose={() => setSuccess(false)}>
-            File uploaded successfully! <strong>{numNewStudents}</strong> new students were added.
+            File uploaded successfully!
           </Alert>
         ) : undefined}
         {error ? (
           <Alert className="mt-2" variant="danger" dismissible onClose={() => setError(null)}>
-            There was an error uploading the file. See browser console for details.
+            There were some errors with the uploaded file. Please see the console for details.
           </Alert>
         ) : undefined}
       </Modal.Body>
