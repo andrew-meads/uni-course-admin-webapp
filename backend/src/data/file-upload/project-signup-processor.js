@@ -2,7 +2,7 @@ import { parseCsv } from "./parse-csv.js";
 import { User, ProjectGroup } from "../schema.js";
 
 const NUM_HEADER_ROWS = 1;
-const MAX_GROUP_MEMBERS = 6;
+const MAX_GROUP_MEMBERS = 7;
 const COL_IDEAS = 2;
 const COL_QUESTIONS = 3;
 const COLS_NAME = [];
@@ -54,7 +54,13 @@ export async function processProjectSignupCsv(csvFile) {
   }
 
   // If any errors, throw them - don't modify DB.
-  if (errors.length > 0) throw errors;
+  if (errors.length > 0) {
+    errors.forEach((e) => {
+      console.log(e);
+      console.log();
+    });
+    throw errors;
+  }
 
   // If we get here, all groups are good - add to database.
   const dbGroups = parsedRecords.map(
@@ -80,25 +86,31 @@ async function parseGroupRecord(record, num) {
     name: `TempName${num}`,
     initialQuestions: record[COL_QUESTIONS],
     initialIdeas: record[COL_IDEAS],
-    members: members.map((m) => ({ student: m, isGithubInviteSent: false }))
+    members: members.map((m) => ({ student: m._id, isGithubInviteSent: false }))
   };
 }
 
 async function parseGroupMembers(record, num) {
   const members = [];
   for (let i = 0; i < MAX_GROUP_MEMBERS; i++) {
-    const name = record[COLS_NAME[i]];
-    const uniId = record[COLS_STUDENTID[i]];
-    const upi = record[COLS_UPI[i]];
+    const name = record[COLS_NAME[i]]?.trim();
+    const uniId = record[COLS_STUDENTID[i]]?.trim();
+    const upi = record[COLS_UPI[i]]?.trim();
     // console.log("Record", num, name, uniId, upi);
 
     if (!name || name.length === 0) continue; // Skip if blank name
 
-    // Try to get student by id
-    let student = await User.findOne({ uniId: parseInt(uniId) });
+    let student = null;
 
-    // If fail, try to get by upi
-    if (!student) student = await User.findOne({ emailAddress: `${upi}@aucklanduni.ac.nz` });
+    try {
+      // Try to get student by id
+      if (uniId && uniId.length > 0) student = await User.findOne({ uniId: parseInt(uniId) });
+
+      // If fail, try to get by upi
+      if (!student && upi && upi.length > 0) student = await User.findOne({ emailAddress: `${upi}@aucklanduni.ac.nz` });
+    } catch (dbError) {
+      throw `Record ${num}: Corrupt record contains dodgy data, cannot read from database (${name}, ${uniId}, ${upi}).`;
+    }
 
     // If still not found, throw "unknown student" exception
     if (!student) throw `Record ${num}: Found unknown student (${name}, ${uniId}, ${upi})`;

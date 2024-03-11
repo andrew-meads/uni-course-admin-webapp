@@ -4,18 +4,20 @@ import styles from "./GroupAdminMain.module.css";
 import { useState } from "react";
 import GroupsList from "../../components/group-admin-page/GroupsList";
 import clsx from "clsx";
-import { useStudents } from "../../js/state/use-students";
 import { useDialog } from "../../components/DialogProvider";
+import { useAuth } from "../../components/Auth";
 
 /**
  * Main area of group admin page, allows new group creation and dragging of students to groups.
  */
 export default function GroupAdminMain() {
   const showDialog = useDialog();
+  const { token } = useAuth();
 
   // State relating to showing groups
-  const { moveStudentToGroup } = useStudents();
-  const { groupsWithStudents, mergeGroups, deleteGroup, createNewGroup } = useGroups();
+  // const { moveStudentToGroup } = useStudents();
+  // const { groupsWithStudents, mergeGroups, deleteGroup, createNewGroup } = useGroups();
+  const { groups, createNewGroup, mergeGroups, deleteGroup, moveStudentToGroup } = useGroups(token);
   const [groupNameFilter, setGroupNameFilter] = useState("");
 
   // State relating to merging groups
@@ -36,8 +38,7 @@ export default function GroupAdminMain() {
     if (name === "")
       return showDialog({ title: "No name provided", content: "Please enter a group name!" });
 
-    const exists =
-      groupsWithStudents.findIndex((g) => g.name.toLowerCase() === name.toLowerCase()) >= 0;
+    const exists = groups.findIndex((g) => g.name.toLowerCase() === name.toLowerCase()) >= 0;
 
     if (exists)
       return showDialog({
@@ -52,7 +53,7 @@ export default function GroupAdminMain() {
         content: `"${name}" is not a valid group name.`
       });
 
-    createNewGroup(name);
+    createNewGroup(name, token);
   }
 
   // Closes the "merge groups" dialog
@@ -65,7 +66,7 @@ export default function GroupAdminMain() {
   function handleAcceptMerge() {
     setShowMergeDialog(false);
     const { targetGroup, sourceGroup } = groupsToMerge;
-    mergeGroups(targetGroup, sourceGroup);
+    mergeGroups(targetGroup, sourceGroup, token);
   }
 
   // Closes the "delete group" dialog
@@ -76,7 +77,7 @@ export default function GroupAdminMain() {
    * group to be deleted.
    */
   function handleAcceptDelete() {
-    deleteGroup(groupToDelete);
+    deleteGroup(groupToDelete, true, token);
     setGroupToDelete(null);
   }
 
@@ -87,8 +88,8 @@ export default function GroupAdminMain() {
    * @param {import('../../js/typedefs').Student} student the student which was dropped
    */
   function handleStudentDropped(group, student) {
-    // console.log("group", group, "student", student);
-    moveStudentToGroup(student, group.id);
+    console.log(`${student.firstName} ${student.lastName} dropped onto group ${group.name}`);
+    moveStudentToGroup(student, group, token);
   }
 
   /**
@@ -99,7 +100,7 @@ export default function GroupAdminMain() {
    * @param {import('../../js/typedefs').Group} sourceGroup the group which was dropped
    */
   function handleGroupDropped(targetGroup, sourceGroup) {
-    // console.log("targetGroup", targetGroup, "sourceGroup", sourceGroup);
+    console.log(`${sourceGroup.name} dropped onto ${targetGroup.name}`);
     setGroupsToMerge({ targetGroup, sourceGroup });
     setShowMergeDialog(true);
   }
@@ -130,7 +131,7 @@ export default function GroupAdminMain() {
         {/* Space for holding all group cards */}
         <div className={clsx(styles.groupsContainer)}>
           <GroupsList
-            groups={groupsWithStudents}
+            groups={groups}
             nameFilter={groupNameFilter}
             onStudentDropped={handleStudentDropped}
             onGroupDropped={handleGroupDropped}

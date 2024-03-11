@@ -1,5 +1,4 @@
 import { ListGroup } from "react-bootstrap";
-import { useGroups } from "../../js/state/use-groups";
 import { ItemTypes } from "../../js/drag-drop";
 import { useDrag } from "react-dnd";
 
@@ -9,9 +8,6 @@ import { useDrag } from "react-dnd";
  * @param {{student: import('../../js/typedefs').Student}} props
  */
 export default function StudentListItem({ student }) {
-  const { groups } = useGroups();
-  const studentGroup = groups.find((g) => g.id === student.groupId);
-
   const [{ isDragging }, dragRef] = useDrag({
     type: ItemTypes.STUDENT,
     item: student,
@@ -20,10 +16,10 @@ export default function StudentListItem({ student }) {
 
   return (
     <ListGroup.Item as="li" ref={dragRef} variant={isDragging ? "info" : undefined}>
-      <strong>{student.name}</strong>
+      <strong>{student.firstName} {student.lastName}</strong>
       <br />
       <em className="text-secondary">
-        {studentGroup ? <>(Member of group {studentGroup.name})</> : "(Not in a group)"}
+        {student.groupName ? <>(Member of group {student.groupName})</> : "(Not in a group)"}
       </em>
     </ListGroup.Item>
   );

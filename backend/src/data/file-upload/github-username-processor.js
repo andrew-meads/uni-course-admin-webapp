@@ -37,6 +37,7 @@ export async function processGithubUsernameCsv(csvFile) {
     let verifiedLogin;
     try {
       verifiedLogin = await verifyGitHubUsername(githubUsername);
+      console.log(`#${recordNum}: ${emailAddress} => ${verifiedLogin}`);
 
       // If verified, save to db.
       await User.findByIdAndUpdate(student._id, { githubUsername: verifiedLogin });

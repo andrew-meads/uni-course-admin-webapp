@@ -14,4 +14,7 @@ router.use("/users", usersRoutes);
 import uploadsRoutes from "./api-uploads.js";
 router.use("/uploads", uploadsRoutes);
 
+import groupsRoutes from "./api-groups.js";
+router.use("/groups", groupsRoutes);
+
 export default router;

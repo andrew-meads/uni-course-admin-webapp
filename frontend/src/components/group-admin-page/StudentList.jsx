@@ -22,7 +22,7 @@ export default function StudentList({ students, nameFilter, hideStudentsInGroups
   return (
     <ListGroup as="ul">
       {displayedStudents.map((s) => (
-        <StudentListItem key={s.id} student={s} />
+        <StudentListItem key={s._id} student={s} />
       ))}
     </ListGroup>
   );
@@ -36,9 +36,9 @@ export default function StudentList({ students, nameFilter, hideStudentsInGroups
  * @param {boolean} hideStudentsInGroups if true, filters out students who are in groups
  */
 function studentFilter(student, nameFilter, hideStudentsInGroups) {
+  const name = student.firstName + " " + student.lastName;
   return (
-    (!(nameFilter && nameFilter !== "") ||
-      student.name.toLowerCase().includes(nameFilter.toLowerCase())) &&
-    (!hideStudentsInGroups || !!!student.groupId)
+    (!(nameFilter && nameFilter !== "") || name.toLowerCase().includes(nameFilter.toLowerCase())) &&
+    (!hideStudentsInGroups || !!!student.groupName)
   );
 }

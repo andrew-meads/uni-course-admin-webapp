@@ -30,7 +30,7 @@ export default function GroupsList({
     <>
       {filteredGroups.map((g) => (
         <GroupCard
-          key={g.id}
+          key={g._id}
           group={g}
           onStudentDropped={onStudentDropped}
           onGroupDropped={onGroupDropped}

@@ -36,7 +36,8 @@ export default function UploadProjectGroupsCSVModal({ show, onClose }) {
       })
       .catch((error) => {
         const data = error.response?.data;
-        console.error(data ?? error);
+        console.log(data ? "DATA" : "ERROR");
+        console.log(data ?? error);
         setError(data ?? ["Unknown error - check browser console!"]);
         setUploading(false);
       });

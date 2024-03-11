@@ -11,7 +11,6 @@ const userSchema = new Schema({
   roles: [{ type: String, enum: ["admin", "student"] }],
   loginUuid: String,
   githubUsername: String,
-  projectGroup: { type: mongoose.Schema.Types.ObjectId, ref: "ProjectGroup" }
 });
 
 const projectGroupSchema = new Schema({
