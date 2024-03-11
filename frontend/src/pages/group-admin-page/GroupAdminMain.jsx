@@ -19,6 +19,8 @@ export default function GroupAdminMain() {
   // const { groupsWithStudents, mergeGroups, deleteGroup, createNewGroup } = useGroups();
   const { groups, createNewGroup, mergeGroups, deleteGroup, moveStudentToGroup } = useGroups(token);
   const [groupNameFilter, setGroupNameFilter] = useState("");
+  const [groupSizeFilter, setGroupSizeFilter] = useState();
+  const [isGroupSizeLessThan, setGroupSizeLessThen] = useState(false);
 
   // State relating to merging groups
   const [showMergeDialog, setShowMergeDialog] = useState(false);
@@ -105,6 +107,20 @@ export default function GroupAdminMain() {
     setShowMergeDialog(true);
   }
 
+  const filteredGroups = groups.filter(
+    (g) =>
+      (!!!groupNameFilter ||
+        groupNameFilter === "" ||
+        g.name.toLowerCase().includes(groupNameFilter.toLowerCase())) &&
+      (isNaN(groupSizeFilter) ||
+        (isGroupSizeLessThan && g.members.length <= groupSizeFilter) ||
+        (!isGroupSizeLessThan && g.members.length >= groupSizeFilter))
+  );
+
+  let showGroupsMessage = "Currently showing groups with any number of students";
+  if (groupSizeFilter !== undefined && !isNaN(groupSizeFilter))
+    showGroupsMessage = `Currently showing groups with ${isGroupSizeLessThan ? "<=" : ">="} ${groupSizeFilter} students`;
+
   return (
     <>
       <div>
@@ -122,8 +138,31 @@ export default function GroupAdminMain() {
                 onChange={(e) => setGroupNameFilter(e.target.value)}
               />
             </Col>
-            <Col xs="auto">
+            <Col xs="6">
               <Button onClick={handleCreateNewGroup}>Create new group</Button>
+            </Col>
+            {/* <Col xs="3">
+              <Button onClick={handleCreateNewGroup}>Assign group names</Button>
+            </Col> */}
+          </Row>
+          <Row className="mt-2">
+            <Col>
+              <Form.Control
+                type="number"
+                placeholder="Filter group size"
+                value={groupSizeFilter}
+                onChange={(e) => setGroupSizeFilter(parseInt(e.target.value))}
+              />
+            </Col>
+            <Col xs="6" className="align-self-center">
+              <Form.Check
+                className="text-secondary"
+                id="greater-than-switch"
+                type="switch"
+                label={showGroupsMessage}
+                checked={isGroupSizeLessThan}
+                onChange={(e) => setGroupSizeLessThen(e.target.checked)}
+              />
             </Col>
           </Row>
         </Form>
@@ -131,8 +170,7 @@ export default function GroupAdminMain() {
         {/* Space for holding all group cards */}
         <div className={clsx(styles.groupsContainer)}>
           <GroupsList
-            groups={groups}
-            nameFilter={groupNameFilter}
+            groups={filteredGroups}
             onStudentDropped={handleStudentDropped}
             onGroupDropped={handleGroupDropped}
             onDeleteGroup={(g) => setGroupToDelete(g)}

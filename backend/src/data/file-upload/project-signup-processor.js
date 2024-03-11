@@ -14,6 +14,110 @@ for (let i = 0; i < MAX_GROUP_MEMBERS; i++) {
   COLS_UPI.push(i * 3 + 6);
 }
 
+const adjectiveAnimalPairs = [
+  "Amber Antelopes",
+  "Blue Bears",
+  "Cheery Cats",
+  "Dapper Dolphins",
+  "Elegant Elephants",
+  "Fuzzy Foxes",
+  "Golden Giraffes",
+  "Happy Hippos",
+  "Icy Iguanas",
+  "Jolly Jaguars",
+  "Kind Koalas",
+  "Lively Lions",
+  "Mellow Monkeys",
+  "Noble Narwhals",
+  "Orange Owls",
+  "Playful Penguins",
+  "Quirky Quails",
+  "Radiant Rabbits",
+  "Silly Sloths",
+  "Teal Turtles",
+  "Unique Unicorns",
+  "Vivid Vultures",
+  "Witty Walruses",
+  "Xylophone Xeruses",
+  "Yellow Yaks",
+  "Zesty Zebras",
+  "Azure Alpacas",
+  "Bright Bats",
+  "Coral Crocodiles",
+  "Dreamy Ducks",
+  "Enchanting Eagles",
+  "Fancy Flamingos",
+  "Glowing Gazelles",
+  "Happy Herons",
+  "Iridescent Impalas",
+  "Jovial Jackals",
+  "Kindly Kangaroos",
+  "Luminous Lemurs",
+  "Marvelous Moose",
+  "Mystic Manatees",
+  "Noble Nightingales",
+  "Ornate Ostriches",
+  "Peach Peacocks",
+  "Quaint Quokkas",
+  "Radiant Raccoons",
+  "Sunny Squirrels",
+  "Tranquil Toucans",
+  "Unique Uakaris",
+  "Vibrant Vipers",
+  "Whimsical Wallabies",
+  "Xanthic Xiphosuras",
+  "Yellowbacked Yellowhammers",
+  "Zippy Zonkeys",
+  "Apricot Aardvarks",
+  "Blueberry Baboons",
+  "Charismatic Chameleons",
+  "Dashing Donkeys",
+  "Eager Emus",
+  "Fluffy Ferrets",
+  "Glistening Geckos",
+  "Hearty Hyenas",
+  "Iridescent Insects",
+  "Jolly Jays",
+  "Kindhearted Kinkajous",
+  "Luminous Lizards",
+  "Majestic Macaws",
+  "Nifty Numbats",
+  "Olive Ocelots",
+  "Prancing Porcupines",
+  "Quick Quetzals",
+  "Rainbow Rams",
+  "Spirited Servals",
+  "Twinkling Tamarins",
+  "Unicornfish",
+  "Vibrant Vultures",
+  "Whimsical Wombats",
+  "Xylophone Xenopses",
+  "Yellowhammerfinches",
+  "Zestful Zorses",
+  "Aqua Axolotls",
+  "Brilliant Binturongs",
+  "Cuddly Capybaras",
+  "Dapper Dholes",
+  "Energetic Echidnas",
+  "Fearless Fossas",
+  "Glittering Guppies",
+  "Harmonious Hares",
+  "Iridescent Iguanas",
+  "Jovial Jerboas",
+  "Keen Kiwis",
+  "Luminous Lyrebirds",
+  "Magical Mandrills",
+  "Nimble Nuthatches",
+  "Olive Oribis",
+  "Playful Pangolins",
+  "Quirky Quokkas",
+  "Radiant Ruffed Lemurs",
+  "Shimmering Shrews",
+  "Tranquil Tamanduas",
+  "Unique Umbrellabirds"
+];
+let nameIndex = 0;
+
 /**
  * Processes the group project signup form, downloaded from Google Forms as a CSV.
  *
@@ -83,7 +187,7 @@ async function parseGroupRecord(record, num) {
   const members = await parseGroupMembers(record, num);
 
   return {
-    name: `TempName${num}`,
+    name: adjectiveAnimalPairs[nameIndex++],
     initialQuestions: record[COL_QUESTIONS],
     initialIdeas: record[COL_IDEAS],
     members: members.map((m) => ({ student: m._id, isGithubInviteSent: false }))
@@ -107,7 +211,8 @@ async function parseGroupMembers(record, num) {
       if (uniId && uniId.length > 0) student = await User.findOne({ uniId: parseInt(uniId) });
 
       // If fail, try to get by upi
-      if (!student && upi && upi.length > 0) student = await User.findOne({ emailAddress: `${upi}@aucklanduni.ac.nz` });
+      if (!student && upi && upi.length > 0)
+        student = await User.findOne({ emailAddress: `${upi}@aucklanduni.ac.nz` });
     } catch (dbError) {
       throw `Record ${num}: Corrupt record contains dodgy data, cannot read from database (${name}, ${uniId}, ${upi}).`;
     }

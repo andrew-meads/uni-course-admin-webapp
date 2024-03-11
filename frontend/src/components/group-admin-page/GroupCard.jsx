@@ -50,10 +50,14 @@ export default function GroupCard({ group, onStudentDropped, onGroupDropped, onD
   const bg = isDragging ? "info" : isOver ? "success" : undefined;
 
   return (
-    <Card ref={ref} style={{ width: "300px" }} bg={bg}>
-      <Card.Img variant="top" src="https://placehold.co/300x100" />
+    <Card ref={ref} style={{ width: "600px" }} bg={bg}>
+      <Card.Img variant="top" src="https://placehold.co/600x50" />
       <Card.Body>
         <Card.Title>{group.name}</Card.Title>
+        <p>
+          <strong>Ideas: </strong>
+          {group.initialIdeas && group.initialIdeas.length > 0 ? group.initialIdeas : "None"}
+        </p>
         <GroupStudentsList students={students} />
         <div style={{ display: "flex", justifyContent: "end" }}>
           <Button variant="danger" size="sm" onClick={() => onDelete(group)}>
