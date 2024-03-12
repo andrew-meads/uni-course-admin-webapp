@@ -1,7 +1,7 @@
 import { DB_URL } from "../env.js";
 
 import mongoose from "mongoose";
-import { User } from "./schema.js";
+import { User } from "../data/schema.js";
 import bcrypt from "bcrypt";
 
 await mongoose.connect(DB_URL);

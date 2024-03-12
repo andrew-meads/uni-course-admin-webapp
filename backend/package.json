@@ -7,7 +7,10 @@
   "scripts": {
     "dev": "nodemon ./src/app.js",
     "start": "node ./src/app.js",
-    "init-db": "node ./src/data/init-db.js"
+    "scripts/init-db": "node ./src/scripts/init-db.js",
+    "scripts/create-project-repos": "node ./src/scripts/create-project-repos.js",
+    "scripts/group-names": "node ./src/scripts/output-group-names.js",
+    "scripts/group-images": "node ./src/scripts/assign-group-images.js"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +25,7 @@
     "dayjs": "^1.11.10",
     "dotenv": "^16.4.1",
     "express": "^4.18.2",
+    "isomorphic-git": "^1.25.6",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.1.1",
     "morgan": "^1.10.0",
