@@ -32,7 +32,7 @@ await withDatabase(async () => {
     }
     counter++;
 
-    if (counter === 3) break;
+    // if (counter === 3) break;
   }
 
   console.log(`${counter} groups processed.`);
