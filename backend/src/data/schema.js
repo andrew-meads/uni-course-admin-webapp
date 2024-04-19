@@ -10,13 +10,15 @@ const userSchema = new Schema({
   passHash: String,
   roles: [{ type: String, enum: ["admin", "student"] }],
   loginUuid: String,
-  githubUsername: String,
+  githubUsername: String
 });
 
 const projectGroupSchema = new Schema({
   name: String,
   isTempName: Boolean,
   githubUrl: String,
+  imageUrl: String,
+  repoInitialized: Boolean,
   initialEmailSent: Boolean,
   reviewersEmailSent: Boolean,
   initialQuestions: String,

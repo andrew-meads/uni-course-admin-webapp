@@ -49,12 +49,35 @@ export default function GroupCard({ group, onStudentDropped, onGroupDropped, onD
 
   const bg = isDragging ? "info" : isOver ? "success" : undefined;
 
+  let cardStyle = { width: "400px", position: "relative" };
+  // if (group.imageUrl) {
+  //   cardStyle.backgroundImage = `url(http://localhost:3000/${group.imageUrl})`;
+  //   cardStyle.backgroundSize = "cover";
+  //   cardStyle.backgroundPosition = "center";
+  // }
+
   return (
-    <Card ref={ref} style={{ width: "600px" }} bg={bg}>
-      <Card.Img variant="top" src="https://placehold.co/600x50" />
-      <Card.Body>
+    <Card ref={ref} style={{ width: "400px", position: "relative" }} bg={bg}>
+      {/* <Card.Img variant="top" src="https://placehold.co/600x50" /> */}
+      {group.imageUrl ? (
+        <img
+          src={`http://localhost:3000/${group.imageUrl}`}
+          alt=""
+          style={{
+            position: "absolute",
+            opacity: "0.1",
+            width: "400px",
+            height: "100%",
+            borderRadius: "5px",
+            objectFit: "cover",
+            objectPosition: "center",
+            zIndex: 0
+          }}
+        />
+      ) : undefined}
+      <Card.Body style={{ position: "relative", zIndex: 1 }}>
         <Card.Title>{group.name}</Card.Title>
-        <p>
+        <p style={{ maxHeight: "75px", overflowY: "auto" }}>
           <strong>Ideas: </strong>
           {group.initialIdeas && group.initialIdeas.length > 0 ? group.initialIdeas : "None"}
         </p>

@@ -26,6 +26,7 @@
  * @property {string} notes
  * @property {string | null} presentationDate
  * @property {GroupMemberRecord[]} members
+ * @property {String | undefined} imageUrl
  *
  */
 export {};

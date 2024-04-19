@@ -3,7 +3,7 @@ import { Octokit } from "@octokit/rest";
 import { throttling } from "@octokit/plugin-throttling";
 
 const MyOctokit = Octokit.plugin(throttling);
-const octokit = new MyOctokit({
+export const octokit = new MyOctokit({
   auth: GITHUB_API_KEY,
   userAgent: "cs732-course-admin/v1.0",
   throttle: {
