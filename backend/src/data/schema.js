@@ -39,5 +39,7 @@ const projectGroupSchema = new Schema({
   ]
 });
 
+const assignmentSchema = new Schema({});
+
 export const User = mongoose.model("User", userSchema);
 export const ProjectGroup = mongoose.model("ProjectGroup", projectGroupSchema);
