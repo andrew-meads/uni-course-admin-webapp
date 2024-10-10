@@ -1,17 +1,18 @@
 .studentListDiv {
   position: absolute;
-  top: 323px;
-  bottom: 0;
+  /* top: 323px; */
+  top: 340px;
+  bottom: 10px;
   width: 352px;
   overflow-x: hidden;
   overflow-y: scroll;
-  border-right: 2px dashed lightgray;
+  /* border-right: 2px dashed lightgray; */
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.expand,
+/* .expand,
 .collapse {
   animation-timing-function: ease;
   animation-duration: 0.35s;
@@ -43,4 +44,4 @@
   to {
     width: 0;
   }
-}
+} */

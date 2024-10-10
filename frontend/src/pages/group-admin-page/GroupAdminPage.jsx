@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Col, Collapse, Form, Row } from "react-bootstrap";
+import { Col, Collapse, Container, Form, Row } from "react-bootstrap";
 import clsx from "clsx";
 import styles from "./GroupAdminPage.module.css";
 import StudentsSidebar from "./StudentsSidebar";
@@ -10,9 +10,10 @@ export default function GroupAdminPage() {
   const [showStudents, setShowStudents] = useState(true);
 
   return (
-    <>
+    <Container className="mt-2" fluid>
       <h1>Group Admin</h1>
-      <Form>
+      <p>Manage your groups here.</p>
+      {/* <Form>
         <Row>
           <Col xs="auto">
             Manage your groups here. Switch the following to show / hide students:
@@ -28,19 +29,23 @@ export default function GroupAdminPage() {
             />
           </Col>
         </Row>
-      </Form>
+      </Form> */}
 
       <div className={clsx(styles.mainGrid)}>
-        <Collapse in={showStudents} dimension={"width"}>
+        {/* <Collapse in={showStudents} dimension={"width"}>
           <aside>
             <StudentsSidebar show={showStudents} />
           </aside>
-        </Collapse>
+        </Collapse> */}
+
+        <aside>
+          <StudentsSidebar show={showStudents} />
+        </aside>
 
         <main>
           <GroupAdminMain />
         </main>
       </div>
-    </>
+    </Container>
   );
 }

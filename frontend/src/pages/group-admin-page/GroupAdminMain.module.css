@@ -1,9 +1,24 @@
-.groupsContainer {
+/* .groupsContainer {
   position: absolute;
-  top: 323px;
+  top: 340px;
   bottom: 0;
   overflow-y: scroll;
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+} */
+
+.groupsContainer {
+  position: absolute;
+  /* top: 323px; */
+  top: 340px;
+  bottom: 10px;
+  left: 382px;
+  right: 10px;
+  overflow-y: scroll;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 230px;
   flex-wrap: wrap;
   gap: 10px;
 }

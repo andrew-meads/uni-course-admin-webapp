@@ -48,16 +48,9 @@ export default function GroupCard({ group, onStudentDropped, onGroupDropped, onD
   dragRef(dropRef(ref));
 
   const bg = isDragging ? "info" : isOver ? "success" : undefined;
-
-  let cardStyle = { width: "400px", position: "relative" };
-  // if (group.imageUrl) {
-  //   cardStyle.backgroundImage = `url(http://localhost:3000/${group.imageUrl})`;
-  //   cardStyle.backgroundSize = "cover";
-  //   cardStyle.backgroundPosition = "center";
-  // }
-
+  // style={{ width: "400px" }}
   return (
-    <Card ref={ref} style={{ width: "400px", position: "relative" }} bg={bg}>
+    <Card ref={ref} bg={bg}>
       {/* <Card.Img variant="top" src="https://placehold.co/600x50" /> */}
       {group.imageUrl ? (
         <img
@@ -66,7 +59,7 @@ export default function GroupCard({ group, onStudentDropped, onGroupDropped, onD
           style={{
             position: "absolute",
             opacity: "0.1",
-            width: "400px",
+            width: "100%",
             height: "100%",
             borderRadius: "5px",
             objectFit: "cover",
@@ -82,12 +75,14 @@ export default function GroupCard({ group, onStudentDropped, onGroupDropped, onD
           {group.initialIdeas && group.initialIdeas.length > 0 ? group.initialIdeas : "None"}
         </p>
         <GroupStudentsList students={students} />
+      </Card.Body>
+      <Card.Footer>
         <div style={{ display: "flex", justifyContent: "end" }}>
           <Button variant="danger" size="sm" onClick={() => onDelete(group)}>
             Delete group
           </Button>
         </div>
-      </Card.Body>
+      </Card.Footer>
     </Card>
   );
 }

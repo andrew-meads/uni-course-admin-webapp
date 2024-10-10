@@ -1,4 +1,4 @@
-import { Accordion } from "react-bootstrap";
+import { Accordion, Container } from "react-bootstrap";
 import { useUser } from "../../components/Auth";
 import { useApiUser } from "../../js/api/apis";
 import GitHubUsernameSection from "../shared/GitHubUsernameSection";
@@ -10,7 +10,8 @@ export default function HomePage() {
   const { data: apiUser, refresh: refreshUser } = useApiUser();
 
   return (
-    <main>
+    <Container as={"main"} className="mt-2">
+
       <h1>Hi {authUser.firstName}!</h1>
       <p>This is your homepage.</p>
 
@@ -21,6 +22,7 @@ export default function HomePage() {
       <Accordion defaultActiveKey="actions">
         {authUser.roles.includes("admin") ? <AdminActionsSection /> : undefined}
       </Accordion>
-    </main>
+
+    </Container>
   );
 }

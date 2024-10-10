@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Row, Col, Form, Button, Card, Alert } from "react-bootstrap";
+import { Row, Col, Form, Button, Card, Alert, Container } from "react-bootstrap";
 
 import { login } from "../../js/api/apis";
 import { useAuth } from "../../components/Auth";
@@ -27,7 +27,7 @@ export default function LoginPage() {
   }
 
   return (
-    <>
+    <Container className="mt-2">
       <Row className="justify-content-md-center">
         <Col xs={12} md={6}>
           <Card className="mt-5">
@@ -89,6 +89,6 @@ export default function LoginPage() {
           </Card>
         </Col>
       </Row>
-    </>
+    </Container>
   );
 }

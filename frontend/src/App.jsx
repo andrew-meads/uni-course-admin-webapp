@@ -13,50 +13,48 @@ function App() {
     <>
       <NavBar />
 
-      <Container className="mt-2">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <RequiresAuth navigatePathWhenNotAuth="/login">
-                <HomePage />
-              </RequiresAuth>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <RequiresAuth navigatePathWhenNotAuth="/login">
-                <ProfilePage />
-              </RequiresAuth>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <RequiresNonAuth>
-                <LoginPage />
-              </RequiresNonAuth>
-            }
-          />
-          <Route
-            path="/group-admin"
-            element={
-              <RequiresRoles roles={["admin"]} noAuthPath="/login" invalidRolesPath="/">
-                <GroupAdminPage />
-              </RequiresRoles>
-            }
-          />
-          <Route
-            path="/student-admin"
-            element={
-              <RequiresRoles roles={["admin"]} noAuthPath="/login" invalidRolesPath="/">
-                <StudentAdminPage />
-              </RequiresRoles>
-            }
-          />
-        </Routes>
-      </Container>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <RequiresAuth navigatePathWhenNotAuth="/login">
+              <HomePage />
+            </RequiresAuth>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <RequiresAuth navigatePathWhenNotAuth="/login">
+              <ProfilePage />
+            </RequiresAuth>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <RequiresNonAuth>
+              <LoginPage />
+            </RequiresNonAuth>
+          }
+        />
+        <Route
+          path="/group-admin"
+          element={
+            <RequiresRoles roles={["admin"]} noAuthPath="/login" invalidRolesPath="/">
+              <GroupAdminPage />
+            </RequiresRoles>
+          }
+        />
+        <Route
+          path="/student-admin"
+          element={
+            <RequiresRoles roles={["admin"]} noAuthPath="/login" invalidRolesPath="/">
+              <StudentAdminPage />
+            </RequiresRoles>
+          }
+        />
+      </Routes>
     </>
   );
 }

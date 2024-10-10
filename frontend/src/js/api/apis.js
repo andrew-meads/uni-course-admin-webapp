@@ -13,6 +13,9 @@ export const useApiUser = () => useGet(`${USERS_URL}/me`, { requiresAuth: true }
 export const updateGithubUsername = (username, token) =>
   axios.patch(`${USERS_URL}/me/github-username`, { githubUsername: username }, authHeader(token));
 
+export const updateStudentGithubUsername = (studentId, username, token) =>
+  axios.patch(`${USERS_URL}/${studentId}/github-username`, { githubUsername: username }, authHeader(token));
+
 export const updatePassword = (password, token) =>
   axios.patch(`${USERS_URL}/me/password`, { password }, authHeader(token));
 

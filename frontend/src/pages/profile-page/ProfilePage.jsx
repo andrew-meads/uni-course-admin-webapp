@@ -1,4 +1,4 @@
-import { Accordion } from "react-bootstrap";
+import { Accordion, Container } from "react-bootstrap";
 import { useApiUser } from "../../js/api/apis";
 import EditDetailsSection from "./EditDetailsSection";
 import UserInfoSection from "./UserInfoSection";
@@ -8,7 +8,7 @@ export default function ProfilePage() {
   const { data: apiUser, refresh: refreshUser } = useApiUser();
 
   return (
-    <main>
+    <Container as="main" className="mt-2">
       <h1>Your profile</h1>
       <p>
         Please double check the information below. If any of this is incorrect, please{" "}
@@ -24,6 +24,6 @@ export default function ProfilePage() {
 
         <EditDetailsSection user={apiUser} onDetailsUpdated={refreshUser} />
       </Accordion>
-    </main>
+    </Container>
   );
 }

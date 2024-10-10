@@ -7,9 +7,9 @@
     flex-grow: 1;
   }
 
-  & > aside {
+  /* & > aside {
     border-right: 2px dashed lightgray;
-  }
+  } */
 
   & > aside > div {
     width: 350px;

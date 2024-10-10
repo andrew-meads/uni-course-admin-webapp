@@ -5,7 +5,7 @@ import { throttling } from "@octokit/plugin-throttling";
 const MyOctokit = Octokit.plugin(throttling);
 export const octokit = new MyOctokit({
   auth: GITHUB_API_KEY,
-  userAgent: "cs732-course-admin/v1.0",
+  userAgent: "course-admin/v1.0",
   throttle: {
     onRateLimit: (retryAfter, options, octokit, retryCount) => {
       octokit.log.warn(`Request quota exhausted for request ${options.method} ${options.url}`);

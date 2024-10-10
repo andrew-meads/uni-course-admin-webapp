@@ -30,6 +30,7 @@ export async function addStudentsFromGradebookCSV(csvFile) {
 
     // Get student from line data (throw error if invalid)
     const student = validatedStudent(record);
+    if (!student) continue;
 
     // If already in DB, skip
     // if (await User.findOne({ emailAddress: student.emailAddress })) continue;
@@ -76,7 +77,10 @@ const studentSchema = yup
  * @returns
  */
 function validatedStudent(line) {
+  // console.log("LINE:");
+  // console.log(line);
   const name = line[COL_NAME];
+  if (name === "student, Test") return null; // Don't try to add the test student.
   const commaIndex = name.indexOf(",");
   return studentSchema.validateSync(
     {

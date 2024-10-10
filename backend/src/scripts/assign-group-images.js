@@ -15,7 +15,7 @@ await withDatabase(async () => {
   const files = fs.readdirSync(publicDir);
 
   for (const group of groups) {
-    const file = files.find((f) => f.toLowerCase() === `${group.name.toLowerCase()}.webp`);
+    const file = files.find((f) => f.toLowerCase().includes(group.name.toLowerCase()));
     if (!file) {
       console.error(`${group.name} has no image!!`);
       continue;

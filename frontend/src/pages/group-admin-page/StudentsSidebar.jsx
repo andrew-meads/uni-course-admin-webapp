@@ -12,7 +12,7 @@ import { useGroups } from "../../js/state/use-groups";
  *
  * @param {{show: boolean}} props
  */
-export default function StudentsSidebar({ show }) {
+export default function StudentsSidebar(/*{ show }*/) {
   const { token } = useAuth();
   const { students, getGroupForStudent } = useGroups(token);
   const [nameFilter, setNameFilter] = useState("");
@@ -25,6 +25,7 @@ export default function StudentsSidebar({ show }) {
     }))
     .filter((s) => studentFilter(s, nameFilter, hideStudentsInGroups));
 
+  //style={{border: "1px solid blue"}}
   return (
     <div>
       <h2>Students</h2>
@@ -46,7 +47,7 @@ export default function StudentsSidebar({ show }) {
           onChange={(e) => setHideStudentsInGroups(!e.target.checked)}
         />
       </Form>
-      <div className={clsx(styles.studentListDiv, show ? styles.expand : styles.collapse)}>
+      <div className={clsx(styles.studentListDiv/*, show ? styles.expand : styles.collapse*/)}>
         <StudentList students={displayedStudents} />
       </div>
     </div>

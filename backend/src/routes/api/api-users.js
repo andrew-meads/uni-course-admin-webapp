@@ -117,6 +117,29 @@ router.patch("/me/github-username", requiresAuth(), async (req, res) => {
 });
 
 /**
+ * Updates the given user's GitHub username. Usable only from an admin account.
+ */
+router.patch("/:id/github-username", requiresAuth("admin"), async (req, res) => {
+  const { id } = req.params;
+  if (!id) return res.sendStatus(404);
+
+  const { githubUsername } = req.body;
+  if (!githubUsername) return res.sendStatus(422);
+
+  try {
+    // Verify (throws if invalid)
+    const verified = await verifyGitHubUsername(githubUsername);
+
+    // Save and return
+    await User.findByIdAndUpdate(id, { githubUsername: verified });
+    return res.json({ githubUsername: verified });
+  } catch {
+    // Provided GitHub username not found, or not provided at all.
+    return res.sendStatus(404);
+  }
+});
+
+/**
  * Updates currently authenticated user's password.
  */
 router.patch("/me/password", requiresAuth(), async (req, res) => {

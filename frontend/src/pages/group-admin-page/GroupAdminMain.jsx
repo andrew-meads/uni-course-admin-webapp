@@ -121,6 +121,7 @@ export default function GroupAdminMain() {
   if (groupSizeFilter !== undefined && !isNaN(groupSizeFilter))
     showGroupsMessage = `Currently showing groups with ${isGroupSizeLessThan ? "<=" : ">="} ${groupSizeFilter} students`;
 
+  //style={{border: "1px solid red"}}
   return (
     <>
       <div>
