@@ -1,7 +1,13 @@
+/**
+ * THIS IS THE OLD VERSION OF THIS FILE!!
+ * 
+ * This version didn't use template repos. Am keeping it here so I still have access to the code I wrote.
+ */
+
 import { withDatabase } from "./util.js";
-import { octokit, createRepoFromTemplate, addBPRules } from "../external-apis/github.js";
+import { octokit } from "../external-apis/github.js";
 import { ProjectGroup, User } from "../data/schema.js";
-import { GITHUB_ORG, GIT_TEMP_DIR, GITHUB_API_KEY, PROJECT_REPO_PREFIX, TEMPLATE_REPO_NAME } from "../env.js";
+import { GITHUB_ORG, GIT_TEMP_DIR, GITHUB_API_KEY } from "../env.js";
 import fs from "fs";
 import git from "isomorphic-git";
 import http from "isomorphic-git/http/node/index.js";
@@ -9,6 +15,9 @@ import path from "path";
 
 await withDatabase(async () => {
   fs.mkdirSync(GIT_TEMP_DIR);
+
+  //   const org = await octokit.rest.orgs.get({ org: GITHUB_ORG });
+  //   console.log(org);
 
   let counter = 0;
   const groups = await ProjectGroup.find({}).populate("members.student");
@@ -40,8 +49,6 @@ async function processGroup(group) {
     return;
   }
 
-  // return;
-
   // Add initial files if not already done
   try {
     await addInitialFiles(group);
@@ -50,17 +57,6 @@ async function processGroup(group) {
     console.error(err);
     return;
   }
-
-  // Add BP rules if not already done
-  try {
-    await addBranchProtection(group);
-  } catch (err) {
-    console.error(`Could not add branch protection rules for group ${group.name}!`);
-    console.error(err);
-    return;
-  }
-
-  return;
 
   for (const memberRecord of group.members) {
     try {
@@ -87,12 +83,19 @@ async function createProjectRepo(group) {
   console.log(`Creating GitHub repo for ${group.name} ...`);
 
   // Repo name
-  const repoName = `${PROJECT_REPO_PREFIX}${group.name.toLowerCase().replaceAll(" ", "-")}`;
+  const repoName = `project-group-${group.name.toLowerCase().replace(" ", "-")}`;
   const githubUrl = `https://github.com/${GITHUB_ORG}/${repoName}`;
   // console.log(githubUrl);
 
   // Create the thing
-  await createRepoFromTemplate(GITHUB_ORG, repoName, TEMPLATE_REPO_NAME);
+  await octokit.rest.repos.createInOrg({
+    org: GITHUB_ORG,
+    name: repoName,
+    description: `Project repository for team ${group.name}`,
+    private: true,
+    auto_init: false,
+    has_projects: true
+  });
 
   // Set GH URL, save to DB
   group.githubUrl = githubUrl;
@@ -106,7 +109,7 @@ async function createProjectRepo(group) {
  * @returns the group's temp git dir on this system.
  */
 function getGroupGitDir(group) {
-  return path.join(GIT_TEMP_DIR, group.name.replaceAll(" ", "-"));
+  return path.join(GIT_TEMP_DIR, group.name.replace(" ", "-"));
 }
 
 /**
@@ -119,21 +122,21 @@ async function addInitialFiles(group) {
   if (group.repoInitialized)
     return console.log(`Repo for group ${group.name} is already initialized.`);
 
-  // Create a temp folder where we will store the git repo files for this group
   console.log(`Initializing repo for group ${group.name} ...`);
-  const dirName = getGroupGitDir(group)
-  fs.mkdirSync(dirName);
-
+  fs.mkdirSync(getGroupGitDir(group));
   try {
-    // Clone repo here
-    const dir = path.join(process.cwd(), dirName);
-    await git.clone({
-      fs,
-      http,
-      dir,
-      url: group.githubUrl,
-      onAuth: () => ({ username: GITHUB_API_KEY }),
-    });
+    // Init repo
+    const dir = path.join(process.cwd(), getGroupGitDir(group));
+    await git.init({ fs, dir, defaultBranch: "main" });
+
+    // Copy files across
+    const files = fs.readdirSync("project-repo-template");
+    for (const file of files) {
+      fs.copyFileSync(
+        path.join("project-repo-template", file),
+        path.join(getGroupGitDir(group), file)
+      );
+    }
 
     // Edit readme file, copy image over
     personalizeFiles(group);
@@ -143,12 +146,12 @@ async function addInitialFiles(group) {
     await git.commit({
       fs,
       dir,
-      message: `Personalized repo for Team ${group.name}`,
+      message: "Initial commit",
       author: { name: "Andrew Meads", email: "andrew.meads@auckland.ac.nz" }
     });
 
     // Add origin URL
-    // await git.addRemote({ fs, dir, remote: "origin", url: group.githubUrl });
+    await git.addRemote({ fs, dir, remote: "origin", url: group.githubUrl });
 
     // Push!
     await git.push({
@@ -164,7 +167,7 @@ async function addInitialFiles(group) {
     group.repoInitialized = true;
     await group.save();
   } finally {
-    // Clean up our mess - this doesn't seem to work.
+    // Clean up our mess
     // sleep(1000);
     // fs.rmSync(GIT_TEMP_DIR, { recursive: true, force: true });
   }
@@ -176,17 +179,11 @@ async function addInitialFiles(group) {
  * @param {*} group the group whose personalized files to add.
  */
 function personalizeFiles(group) {
-
-  // Initial file contents
   const readmeFile = path.join(getGroupGitDir(group), "README.md");
   let fileContents = fs.readFileSync(readmeFile, { encoding: "utf-8" });
 
-  // frontend +page.svelte
-  const pageDotSvelteFile = path.join(getGroupGitDir(group), "frontend/src/routes/+page.svelte");
-  let svelteFileContents = fs.readFileSync(pageDotSvelteFile, { encoding: "utf-8" });
-
   // Group nmae
-  fileContents = fileContents.replaceAll("$GROUPNAME", group.name);
+  fileContents = fileContents.replace("$GROUPNAME", group.name);
 
   // Team member names
   const studentNames = group.members
@@ -194,66 +191,32 @@ function personalizeFiles(group) {
     .map((s) => `- ${s.firstName} ${s.lastName}`)
     .join("\r\n");
 
-  fileContents = fileContents.replaceAll("$TEAMMEMBERS", studentNames);
+  fileContents = fileContents.replace("$TEAMMEMBERS", studentNames);
 
   // Group image, if it exists
   if (group.imageUrl) {
-    const sourcePath = `public/${group.imageUrl}`.replaceAll("%20", " ");
-
-    const destDir = path.join(getGroupGitDir(group), "backend/public/images");
-    // fs.mkdirSync(destDir);
+    const sourcePath = `public/${group.imageUrl}`.replace("%20", " ");
+    const destDir = path.join(getGroupGitDir(group), "group-image");
+    fs.mkdirSync(destDir);
     const destFile = group.imageUrl
       .substring(group.imageUrl.lastIndexOf("/") + 1)
-      .replaceAll("%20", " ");
+      .replace("%20", " ");
     const destPath = path.join(destDir, destFile);
-
     fs.copyFileSync(sourcePath, destPath);
-
-    fileContents = fileContents.replaceAll(
+    fileContents = fileContents.replace(
       "$IMAGE",
-      `![](./backend/public/images/${destFile.replaceAll(" ", "%20")})`
+      `![](./group-image/${destFile.replace(" ", "%20")})`
     );
-
-    svelteFileContents = svelteFileContents.replaceAll(
-      "$IMAGE",
-      `<img src={\`\${PUBLIC_IMAGES_URL}/${destFile.replaceAll(" ", "%20")}\`} alt="${group.name}" style="width: 320px" />`
-    );
-
   } else {
-    fileContents = fileContents.replaceAll("$IMAGE", "");
-    svelteFileContents = svelteFileContents.replaceAll("$IMAGE", "");
+    fileContents = fileContents.replace("$IMAGE", "");
   }
 
-  // Write README file and +page.svelte file
   fs.writeFileSync(readmeFile, fileContents, { encoding: "utf-8" });
-  fs.writeFileSync(pageDotSvelteFile, svelteFileContents, { encoding: "utf-8" });
 }
 
 // function sleep(millis) {
 //   return new Promise((resolve) => setTimeout(resolve, millis));
 // }
-
-/**
- * If the given group member isn't already added to the given group's repo, adds them.
- *
- * @param {*} group the group
- */
-async function addBranchProtection(group) {
-  if (group.repoBPInitialized)
-    return console.log(`${group.name} already has BP rules added.`);
-
-  console.log(`Adding branch protection rules for ${group.name} ...`);
-
-  // Repo name
-  const repoName = group.githubUrl.substring(group.githubUrl.lastIndexOf("/") + 1);
-
-  // Create the thing
-  await addBPRules(GITHUB_ORG, repoName);
-
-  // Save record to DB
-  group.repoBPInitialized = true;
-  await group.save();
-}
 
 /**
  * If the given group member isn't already added to the given group's repo, adds them.
@@ -276,7 +239,7 @@ async function addGroupMemberToRepo(group, memberRecord) {
     owner: GITHUB_ORG,
     username: student.githubUsername,
     repo,
-    permission: "write"
+    permission: "admin"
   });
 
   memberRecord.isGithubInviteSent = true;

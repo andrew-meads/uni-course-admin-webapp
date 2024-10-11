@@ -9,6 +9,9 @@ export const GITHUB_API_KEY = process.env.GITHUB_API_KEY;
 export const GITHUB_ORG = process.env.GITHUB_ORG;
 export const GIT_TEMP_DIR = process.env.GIT_TEMP_DIR;
 
+export const PROJECT_REPO_PREFIX = process.env.PROJECT_REPO_PREFIX;
+export const TEMPLATE_REPO_NAME = process.env.TEMPLATE_REPO_NAME;
+
 export const SMTP_SERVER = process.env.SMTP_SERVER;
 export const SMTP_PORT = process.env.SMTP_PORT;
 export const SMTP_USERNAME = process.env.SMTP_USERNAME;

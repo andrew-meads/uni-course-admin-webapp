@@ -13,7 +13,8 @@
     "scripts/group-images": "node ./src/scripts/assign-group-images.js",
     "scripts/send-intro-emails": "node ./src/scripts/send-group-intro-emails.js",
     "scripts/generate-student-csv": "node ./src/scripts/generate-student-csv.js",
-    "scripts/generate-project-csv": "node ./src/scripts/generate-project-csv.js"
+    "scripts/generate-project-csv": "node ./src/scripts/generate-project-csv.js",
+    "scripts/test-stuff": "node ./src/scripts/test-stuff.js"
   },
   "keywords": [],
   "author": "",

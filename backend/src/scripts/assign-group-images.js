@@ -21,7 +21,7 @@ await withDatabase(async () => {
       continue;
     }
 
-    group.imageUrl = `${dir}/${file.replace(" ", "%20")}`;
+    group.imageUrl = `${dir}/${file.replaceAll(" ", "%20")}`;
     await group.save();
     console.log(`${group.name} => ${group.imageUrl}`);
   }

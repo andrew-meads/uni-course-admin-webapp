@@ -19,6 +19,7 @@ const projectGroupSchema = new Schema({
   githubUrl: String,
   imageUrl: String,
   repoInitialized: Boolean,
+  repoBPInitialized: Boolean,
   initialEmailSent: Boolean,
   reviewersEmailSent: Boolean,
   initialQuestions: String,
