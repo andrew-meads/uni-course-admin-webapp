@@ -27,12 +27,12 @@ const projectGroupSchema = new Schema({
   initialIdeas: String,
   notes: String,
   presentationDate: String,
+  githubProjectId: Number,
   members: [
     {
       student: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       isGithubInviteSent: Boolean,
-      isTeamInviteSent: Boolean,
-      isGithubProjectInviteSetn: Boolean
+      isTeamInviteSent: Boolean
     }
   ],
   reviewers: [

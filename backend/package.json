@@ -10,6 +10,7 @@
     "scripts/init-db": "node ./src/scripts/init-db.js",
     "scripts/create-project-repos": "node ./src/scripts/create-project-repos.js",
     "scripts/create-project-teams": "node ./src/scripts/create-project-teams.js",
+    "scripts/create-github-projects": "node ./src/scripts/create-github-projects.js",
     "scripts/group-names": "node ./src/scripts/output-group-names.js",
     "scripts/group-images": "node ./src/scripts/assign-group-images.js",
     "scripts/send-intro-emails": "node ./src/scripts/send-group-intro-emails.js",
@@ -22,6 +23,7 @@
   "license": "ISC",
   "dependencies": {
     "@octokit/core": "^6.0.1",
+    "@octokit/graphql": "^8.1.1",
     "@octokit/plugin-throttling": "^9.0.3",
     "@octokit/rest": "^20.0.2",
     "bcrypt": "^5.1.1",
