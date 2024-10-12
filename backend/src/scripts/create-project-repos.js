@@ -60,7 +60,7 @@ async function processGroup(group) {
     return;
   }
 
-  return;
+  // return;
 
   for (const memberRecord of group.members) {
     try {

@@ -71,11 +71,11 @@ function buildHtml(group) {
   return `
 <p>Kia ora ${allNames},</p>
 <p></p>
-<p>Welcome to the COMPSCI732 / SOFTENG 750 project, and to Team ${group.name}! This email
+<p>Welcome to the COMPSCI718 / 719 project, and to Team ${group.name}! This email
 is to e-introduce you all, and let you know your team's GitHub repository.</p>
 
 <p>Please <a href="${group.githubUrl}">follow this link to the ${group.name} team GitHub respository</a>. You
-each should have received an invite already, if you gave me your GitHub usernames.</p>
+each should have received an invite already.</p>
 
 <p>If you have not received the invite, <strong>please reply to this email ASAP with your name, id,
 UPI, and a link to your GitHub profule page.</strong></p>
@@ -96,14 +96,14 @@ function buildPlaintext(group) {
   return `
 Kia ora ${allNames},
 
-Welcome to the COMPSCI732 / SOFTENG 750 project, and to Team ${group.name}! This email
+Welcome to the COMPSCI718 / 719 project, and to Team ${group.name}! This email
 is to e-introduce you all, and let you know your team's GitHub repository.
 
 Please follow this link to the ${group.name} team GitHub respository:
 
 ${group.githubUrl}
 
-You each should have received an invite already, if you gave me your GitHub usernames.
+You each should have received an invite already.
 
 If you have not received the invite, please reply to this email ASAP with your name, id,
 UPI, and a link to your GitHub profule page.
