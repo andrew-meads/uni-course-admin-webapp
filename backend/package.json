@@ -9,6 +9,7 @@
     "start": "node ./src/app.js",
     "scripts/init-db": "node ./src/scripts/init-db.js",
     "scripts/create-project-repos": "node ./src/scripts/create-project-repos.js",
+    "scripts/create-project-teams": "node ./src/scripts/create-project-teams.js",
     "scripts/group-names": "node ./src/scripts/output-group-names.js",
     "scripts/group-images": "node ./src/scripts/assign-group-images.js",
     "scripts/send-intro-emails": "node ./src/scripts/send-group-intro-emails.js",

@@ -10,7 +10,8 @@ const userSchema = new Schema({
   passHash: String,
   roles: [{ type: String, enum: ["admin", "student"] }],
   loginUuid: String,
-  githubUsername: String
+  githubUsername: String,
+  isStudentsTeamInviteSent: Boolean
 });
 
 const projectGroupSchema = new Schema({
@@ -29,7 +30,9 @@ const projectGroupSchema = new Schema({
   members: [
     {
       student: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      isGithubInviteSent: Boolean
+      isGithubInviteSent: Boolean,
+      isTeamInviteSent: Boolean,
+      isGithubProjectInviteSetn: Boolean
     }
   ],
   reviewers: [
