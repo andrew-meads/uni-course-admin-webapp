@@ -82,11 +82,19 @@ function validatedStudent(line) {
   const name = line[COL_NAME];
   if (name === "student, Test") return null; // Don't try to add the test student.
   const commaIndex = name.indexOf(",");
+
+  // HACK: Deal with Tyne's "Sapna" student who has no last name.
+  // If firstName or lastName are empty, just make both equal to the non-empty one.
+  let firstName = name.substring(commaIndex + 2);
+  let lastName = name.substring(0, commaIndex);
+  if (firstName === "") firstName = lastName;
+  else if (lastName === "") lastName = firstName;
+
   return studentSchema.validateSync(
     {
       uniId: line[COL_ID],
-      firstName: name.substring(commaIndex + 2),
-      lastName: name.substring(0, commaIndex),
+      firstName,
+      lastName,
       emailAddress: `${line[COL_UPI]}@aucklanduni.ac.nz`
     },
     { abortEarly: true, stripUnknown: true }
